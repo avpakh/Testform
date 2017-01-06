@@ -1,0 +1,87 @@
+{% extends "layout.html" %}
+
+{% block title %}JSGrid and Django Sample{% endblock %}
+
+{% block head %}
+    <link href="http://js-grid.com/css/jsgrid.min.css" rel="stylesheet" />
+    <link href="http://js-grid.com/css/jsgrid-theme.min.css" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+    <div id="jsGrid"></div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="http://js-grid.com/js/jsgrid.min.js"></script>
+    <script>
+        $(function() {
+
+            $("#jsGrid").jsGrid({
+                height: "50%",
+                width: "100%",
+
+                filtering: true,
+                inserting: true,
+                editing: true,
+                sorting: true,
+                paging: true,
+                autoload: true,
+
+                pageSize: 10,
+                pageButtonCount: 5,
+
+                deleteConfirm: " Вы хотите удалить запись?",
+
+                controller: {
+                    loadData: function(filter) {
+                        var d = $.Deferred();
+
+                        $.ajax({
+                            type: "GET",
+                            url: "/clients/api",
+                            data: filter
+                        }).done(function(result) {
+                            d.resolve($.map(result, function(item) {
+                                return $.extend(item.fields, { id: item.pk });
+                            }));
+                        });
+
+                        return d.promise();
+                    },
+
+                    insertItem: function(item) {
+                        return $.ajax({
+                            type: "POST",
+                            url: "/clients/api",
+                            data: item
+                        });
+                    },
+
+                    updateItem: function(item) {
+                        return $.ajax({
+                            type: "PUT",
+                            url: "/clients/api/" + item.id,
+                            data: item
+                        });
+                    },
+
+                    deleteItem: function(item) {
+                        return $.ajax({
+                            type: "DELETE",
+                            url: "/clients/api/" + item.id
+                        });
+                    }
+                },
+
+                fields: [
+                    { name: "kod_str", type: "integer", width: 10, filtering: false },
+                    { name: "naim", type: "text", width: 250 },
+                    { name: "location", type: "text", width: 200 },
+                    { name: "source_kod", type: "select", filtering: false, sorting: false },
+                    { type: "control" }
+                ]
+            });
+
+        });
+    </script>
+{% endblock %}
