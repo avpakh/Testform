@@ -6,6 +6,7 @@
       <synchronize>true</synchronize>
       <jdbc-driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc-driver>
       <jdbc-url>jdbc:sqlserver://178.124.172.253:1433;databaseName=_gmc</jdbc-url>
+      <libraries />
     </data-source>
   </component>
 </project>

@@ -5,12 +5,19 @@
 {% block title %}  {% endblock %}
 
 {% block head %}
-    <link href="http://js-grid.com/css/jsgrid.min.css" rel="stylesheet" />
-    <link href="http://js-grid.com/css/jsgrid-theme.min.css" rel="stylesheet" />
+   <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.css" />
+   <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid-theme.min.css" />
 {% endblock %}
 
 {% block content %}
     <div id="jsGrid"></div>
+
+
+      <form role="form"  action="." method="post"> {% csrf_token %} {{ form }}
+
+
+       <input type="submit"  name="Razdel1"   value="Принять и перейти к следующему разделу II Водоотведение. Идентификатор формы - {{ id_main }} "  onchange="this.form.submit();"/>
+       </form>
 
       <!-- Footer -->
     <footer>
@@ -27,11 +34,14 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="http://js-grid.com/js/jsgrid.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsgrid/1.5.3/jsgrid.min.js"></script>
+
 
     <script>
 
-        var tt = {{ source_code|safe }}
+        var tt = {{ id_main|safe }}
+
+        var mm = {{ id_razdel|safe }}
 
         $(function() {
 
@@ -63,10 +73,10 @@ jsGrid.fields.water = WaterField;
 
             $("#jsGrid").jsGrid({
                 height: "75%",
-                width: "310%",
+                width: "330%",
 
                 filtering: false,
-                inserting: true,
+                inserting: false,
                 editing: true,
                 sorting: true,
                 paging: true,
@@ -104,7 +114,7 @@ jsGrid.fields.water = WaterField;
 
                         $.ajax({
                             type: "GET",
-                            url: "/inform/api",
+                            url: "/inform/api/1/" + tt,
                             data: filter
                         }).done(function(result) {
                             d.resolve($.map(result, function(item) {
@@ -118,7 +128,7 @@ jsGrid.fields.water = WaterField;
                     insertItem: function(item) {
                         return $.ajax({
                             type: "POST",
-                            url: "/inform/api",
+                            url: "/inform/api/1/" + item.id,
                             data: item
                         });
                     },
@@ -126,24 +136,23 @@ jsGrid.fields.water = WaterField;
                     updateItem: function(item) {
                         return $.ajax({
                             type: "PUT",
-                            url: "/inform/api/" + item.id,
+                            url: "/inform/api/1/" + item.id,
                             data: item
                         });
                     },
 
-                     deleteItem: function(item) {
+                    deleteItem: function(item) {
                         return $.ajax({
                             type: "DELETE",
-                            url: "/inform/api/" + item.id
+                            url: "/inform/api/1/" + tt,
                         });
                     }
-
                 },
                fields: [
-                   { name: "kod_str", type: "number", title: 'Код строки', width: 4 , readOnly : true },
-                   { name: "source_kod", type: "select", title:'Код источника водоснабжения',
+                   { name: "kod_str", title: 'Код строки  |A|', width: 4 , readOnly : true },
+                   { name: "source_kod", type: "select", title:'Код источника водоснабжения |Б|',
                             items: [
-                              { Name: " - введите - ", Id: 0 },
+                              { Name: " - выбор - ", Id: 0 },
                               { Name: "[60] Водоносный горизонт (подземные воды)", Id: 60 },
                               { Name: "[20] река " , Id: 20 },
                               { Name: "[21] ручей " , Id: 21 },
@@ -154,17 +163,24 @@ jsGrid.fields.water = WaterField;
                               { Name: "[70] пруд ", Id: 70 },
                               { Name: "[71] пруд-копань ", Id: 71 },
                               { Name: "[73] обводненный карьер ", Id: 73 },
+                              { Name: "[72] технологический водный объект ", Id: 72 },
                               { Name: "[74] Шахта, рудник, нефтепромысел, карьер ", Id: 74 },
                               { Name: "[75] Скважины вертикального дренажа для понижения уровня грунтовых вод ", Id: 75 },
+                              { Name: "[81] Земляные накопители (накопители-регуляторы, шламонакопители ", Id: 81 },
+                              { Name: "[86] Земляные накопители (накопители-регуляторы, шламонакопители ", Id: 86 },
+                              { Name: "[90] Система питьевого водоснабжения", Id: 90 },
+                              { Name: "[91] Система кализации (кроме дождевой) ", Id: 91 },
+                              { Name: "[92] Система технического водоснабжения ", Id: 92 },
+                              { Name: "[93] Система дождевой канализации ", Id: 93 },
                       ],
                       valueField: "Id",
                       textField: "Name" ,
                            width: 35 , align: "left"},
-                    { name: "naim", type: "text",title: 'Наименование источника водоснабжения' ,width: 60 },
-                    { name: "location", title: 'Местонахождение источника водоснабжения', type: "text", width: 60 },
-                    { name: "kod_basin", title: 'Код бассейна реки', type: "select",
+                    { name: "naim", type: "text",title: 'Наименование источника водоснабжения |В|' ,width: 60 },
+                    { name: "location", title: 'Местонахождение источника водоснабжения |В|', type: "text", width: 60 },
+                    { name: "kod_basin", title: 'Код бассейна реки |Г|', type: "select",
                         items: [
-                              { Name: " - введите - ", Id: 0 },
+                              { Name: " - выбор - ", Id: 0 },
                               { Name: "БАЛ НЕМАН", Id: 1 },
                               { Name: "БАЛ ВИСЛА 381" , Id: 2 },
                               { Name: "БАЛ З.ДВИН" , Id: 3 },
@@ -174,10 +190,10 @@ jsGrid.fields.water = WaterField;
                       valueField: "Id",
                       textField: "Name",
 
-                       width: 20, align : "left"},
-                     { name: "kod_category", title: 'Код категории качества воды', type: "select",
+                       width: 35, align : "left"},
+                     { name: "kod_category", title: 'Код категории качества воды  |Д|', type: "select",
                         items: [
-                              { Name: " - введите - ", Id: 0 },
+                              { Name: " - выбор - ", Id: 0 },
                               { Name: "[ПО] Вода питьевая добытая подземная пресная ", Id: 1},
                               { Name: "[ПМ] Вода питьевая добытая подземная минеральная" , Id: 2},
                               { Name: "[ПП] Вода питьевая изъятая поверхностная " , Id: 3 },
@@ -198,74 +214,17 @@ jsGrid.fields.water = WaterField;
 
                     width: 40, align : "left" },
 
-                    { name: "param_1", type: "water", title: 'Добыто (изъято) воды, тыс. куб. Всего', width: 30, align : "center" },
-                    { name: "param_2", title: 'из них учтено приборами учета,  ', type: "water", width: 30, align : "center" },
-                    { name: "param_3", title: 'Получено воды - объем, тыс. куб. м,  ', type: "water", width: 30, align : "center" },
-                    { name: "kod_wateruser_gvk", title: 'Код водоп-ля по ГВК,  ', type: "text", width: 30 },
-                    { name: "use_total", title: 'Использовано воды - Всего, тыс. куб. м,  ', type: "water", width: 25,align : "center" },
+                    { name: "param_1", type: "water", title: 'Добыто (изъято) воды, тыс. куб. Всего |1|', width: 30, align : "center" },
+                    { name: "param_2", title: 'из них учтено приборами учета,  |2|', type: "water", width: 30, align : "center" },
+                    { name: "param_3", title: 'Получено воды - объем, тыс. куб. м   |3|', type: "water", width: 30, align : "center" },
+                    { name: "kod_wateruser_gvk", title: 'Код водоп-ля по ГВК  |4|', type: "text", width: 30 },
 
-                     { name: "use_tag1", title: 'Код цели водоп-я', type: "select",
+                    { name: "use_total", title: 'Использовано воды - Всего, тыс. куб. м |5|', type: "water", width: 25,align : "center" },
+
+                     { name: "use_tag1", title: 'Код цели водоп-я |6|', type: "select",
                         items: [
-                              { Name: " - введите - ", Id: 0 },
+                              { Name: " - выбор - ", Id: 0 },
 
-                              { Name: "[ХП] Хозяйственно-питьевые нужды", Id: 1 },
-                              { Name: "[ЛЧ] Лечебные (курортные, оздоровительные) нужды" , Id: 2 },
-                              { Name: "[CX] Нужды сельского хозяйства (кроме рыбоводства)" , Id: 3 },
-                              { Name: "[CР] Нужды сельского хозяйства (только рыбоводство)" , Id: 4 },
-                              { Name: "[ПР] Нужды промышленности" , Id: 5 },
-                              { Name: "[ЭН] Энергетические нужды" , Id: 6 },
-                              { Name: "[НП] Для производства напитков и пива (кроме бутилирования пресных и минеральных вод)" , Id: 7 },
-                              { Name: "[БУ] Бутилирование пресных и минеральных вод" , Id: 8 },
-                              { Name: "[ИН] Прочие цели" , Id: 9 }
-                               ],
-                      valueField: "Id",
-                      textField: "Name",
-
-                        width: 30, align : "left"},
-
-                    { name: "vol_tag1", title: 'Объем, тыс. куб. м', type: "water", width: 25, align : "center" },
-
-                    { name: "use_tag2", title: 'Код цели водоп-я', type: "select",
-                        items: [
-                              { Name: " - введите - ", Id: 0 },
-                              { Name: "[ХП] Хозяйственно-питьевые нужды", Id: 1 },
-                              { Name: "[ЛЧ] Лечебные (курортные, оздоровительные) нужды" , Id: 2 },
-                              { Name: "[CX] Нужды сельского хозяйства (кроме рыбоводства)" , Id: 3 },
-                              { Name: "[CР] Нужды сельского хозяйства (только рыбоводство)" , Id: 4 },
-                              { Name: "[ПР] Нужды промышленности" , Id: 5 },
-                              { Name: "[ЭН] Энергетические нужды" , Id: 6 },
-                              { Name: "[НП] Для производства напитков и пива (кроме бутилирования пресных и минеральных вод)" , Id: 7 },
-                              { Name: "[БУ] Бутилирование пресных и минеральных вод" , Id: 8 },
-                              { Name: "[ИН] Прочие цели" , Id: 9 }
-                               ],
-                      valueField: "Id",
-                      textField: "Name",
-
-                        width: 30, align : "left"},
-
-                    { name: "vol_tag2", title: 'Объем, тыс. куб. м', type: "water", width: 25,  align : "center"},
-                     { name: "use_tag3", title: 'Код цели водоп-я', type: "select",
-                        items: [
-                              { Name: " - введите - ", Id: 0 },
-                              { Name: "[ХП] Хозяйственно-питьевые нужды", Id: 1 },
-                              { Name: "[ЛЧ] Лечебные (курортные, оздоровительные) нужды" , Id: 2 },
-                              { Name: "[CX] Нужды сельского хозяйства (кроме рыбоводства)" , Id: 3 },
-                              { Name: "[CР] Нужды сельского хозяйства (только рыбоводство)" , Id: 4 },
-                              { Name: "[ПР] Нужды промышленности" , Id: 5 },
-                              { Name: "[ЭН] Энергетические нужды" , Id: 6 },
-                              { Name: "[НП] Для производства напитков и пива (кроме бутилирования пресных и минеральных вод)" , Id: 7 },
-                              { Name: "[БУ] Бутилирование пресных и минеральных вод" , Id: 8 },
-                              { Name: "[ИН] Прочие цели" , Id: 9 }
-                               ],
-                      valueField: "Id",
-                      textField: "Name",
-
-                    width: 30, align : "left"},
-
-                    { name: "vol_tag3", title: 'Объем, тыс. куб. м', type: "water", width: 25, align : "center"  },
-                    { name: "use_tag4", title: 'Код цели водоп-я', type: "select",
-                        items: [
-                              { Name: " - введите - ", Id: 0 },
                               { Name: "[ХП] Хозяйственно-питьевые нужды", Id: 1 },
                               { Name: "[ЛЧ] Лечебные (курортные, оздоровительные) нужды" , Id: 2 },
                               { Name: "[CX] Нужды сельского хозяйства (кроме рыбоводства)" , Id: 3 },
@@ -281,16 +240,74 @@ jsGrid.fields.water = WaterField;
 
                       width: 30, align : "left"},
 
-                    { name: "vol_tag4", title: 'Объем, тыс. куб. м', type: "water", width: 25, align : "center" },
+                    { name: "vol_tag1", title: 'Объем, тыс. куб. м  |7|' , type: "water", width: 25, align : "center" },
 
-
-                    { name: "rash_oborot", title: 'Расход воды в системах оборотного водоснабжения, тыс. куб. м', type: "water", width: 35, align : "center"},
-
-                    { name: "vol_oborot", title: ' Объем воды  в системах повторного (последовательного) водоснабжения, тыс. куб. м', type: "water", width: 45, align : "center"},
-
-                    { name: "trf_cod_wu1", title: 'Код категории качества воды', type: "select",
+                    { name: "use_tag2", title: 'Код цели водоп-я |8|', type: "select",
                         items: [
-                              { Name: " - введите - ", Id: 0 },
+                              { Name: " - выбор - ", Id: 0 },
+                              { Name: "[ХП] Хозяйственно-питьевые нужды", Id: 1 },
+                              { Name: "[ЛЧ] Лечебные (курортные, оздоровительные) нужды" , Id: 2 },
+                              { Name: "[CX] Нужды сельского хозяйства (кроме рыбоводства)" , Id: 3 },
+                              { Name: "[CР] Нужды сельского хозяйства (только рыбоводство)" , Id: 4 },
+                              { Name: "[ПР] Нужды промышленности" , Id: 5 },
+                              { Name: "[ЭН] Энергетические нужды" , Id: 6 },
+                              { Name: "[НП] Для производства напитков и пива (кроме бутилирования пресных и минеральных вод)" , Id: 7 },
+                              { Name: "[БУ] Бутилирование пресных и минеральных вод" , Id: 8 },
+                              { Name: "[ИН] Прочие цели" , Id: 9 }
+                               ],
+                      valueField: "Id",
+                      textField: "Name",
+
+                        width: 30, align : "left"},
+
+                    { name: "vol_tag2", title: 'Объем, тыс. куб. м,  |9|', type: "water", width: 25,  align : "center"},
+                    { name: "use_tag3", title: 'Код цели водоп-я |10|', type: "select",
+                        items: [
+                              { Name: " - выбор - ", Id: 0 },
+                              { Name: "[ХП] Хозяйственно-питьевые нужды", Id: 1 },
+                              { Name: "[ЛЧ] Лечебные (курортные, оздоровительные) нужды" , Id: 2 },
+                              { Name: "[CX] Нужды сельского хозяйства (кроме рыбоводства)" , Id: 3 },
+                              { Name: "[CР] Нужды сельского хозяйства (только рыбоводство)" , Id: 4 },
+                              { Name: "[ПР] Нужды промышленности" , Id: 5 },
+                              { Name: "[ЭН] Энергетические нужды" , Id: 6 },
+                              { Name: "[НП] Для производства напитков и пива (кроме бутилирования пресных и минеральных вод)" , Id: 7 },
+                              { Name: "[БУ] Бутилирование пресных и минеральных вод" , Id: 8 },
+                              { Name: "[ИН] Прочие цели" , Id: 9 }
+                               ],
+                      valueField: "Id",
+                      textField: "Name",
+
+                    width: 30, align : "left"},
+
+                    { name: "vol_tag3", title: 'Объем, тыс. куб. м |11|', type: "water", width: 25, align : "center"  },
+                    { name: "use_tag4", title: 'Код цели водоп-я, |12|', type: "select",
+                        items: [
+                              { Name: " - выбор - ", Id: 0 },
+                              { Name: "[ХП] Хозяйственно-питьевые нужды", Id: 1 },
+                              { Name: "[ЛЧ] Лечебные (курортные, оздоровительные) нужды" , Id: 2 },
+                              { Name: "[CX] Нужды сельского хозяйства (кроме рыбоводства)" , Id: 3 },
+                              { Name: "[CР] Нужды сельского хозяйства (только рыбоводство)" , Id: 4 },
+                              { Name: "[ПР] Нужды промышленности" , Id: 5 },
+                              { Name: "[ЭН] Энергетические нужды" , Id: 6 },
+                              { Name: "[НП] Для производства напитков и пива (кроме бутилирования пресных и минеральных вод)" , Id: 7 },
+                              { Name: "[БУ] Бутилирование пресных и минеральных вод" , Id: 8 },
+                              { Name: "[ИН] Прочие цели" , Id: 9 }
+                               ],
+                      valueField: "Id",
+                      textField: "Name",
+
+                      width: 30, align : "left"},
+
+                    { name: "vol_tag4", title: 'Объем, тыс. куб. м |13|', type: "water", width: 25, align : "center" },
+
+
+                    { name: "rash_oborot", title: 'Расход воды в системах оборотного водоснабжения, тыс. куб. м  |14|', type: "water", width: 35, align : "center"},
+
+                    { name: "vol_oborot", title: ' Объем воды  в системах повторного (последовательного) водоснабжения, тыс. куб. м  |15|', type: "water", width: 45, align : "center"},
+
+                    { name: "trf_cod_wu1", title: 'Код категории качества воды  |16|', type: "select",
+                        items: [
+                              { Name: " - выбор - ", Id: 0 },
                               { Name: "[ПО] Вода питьевая добытая подземная пресная ", Id: 1},
                               { Name: "[ПМ] Вода питьевая добытая подземная минеральная" , Id: 2},
                               { Name: "[ПП] Вода питьевая изъятая поверхностная " , Id: 3 },
@@ -312,12 +329,11 @@ jsGrid.fields.water = WaterField;
 
                      width: 30, align : "left" },
 
+                    { name: "vol_wu1", title: ' Передано воды без использования или отведения с учетом его качества, тыс. куб. м |17|', type: "water", width: 45, align : "center"},
 
-                    { name: "vol_wu1", title: ' Передано воды без использования или отведения с учетом его качества, тыс. куб. м', type: "water", width: 45, align : "center"},
-
-                    { name: "trf_cod_wu2", title: 'Код категории качества воды', type: "select",
+                    { name: "trf_cod_wu2", title: 'Код категории качества воды |18|', type: "select",
                         items: [
-                              { Name: " - введите - ", Id: 0 },
+                              { Name: " - выбор - ", Id: 0 },
 
                               { Name: "[ПО] Вода питьевая добытая подземная пресная ", Id: 1},
                               { Name: "[ПМ] Вода питьевая добытая подземная минеральная" , Id: 2},
@@ -338,15 +354,13 @@ jsGrid.fields.water = WaterField;
                       valueField: "Id",
                       textField: "Name",
 
-
                      width: 30, align : "left" },
 
+                    { name: "vol_wu2", title: ' Передано воды без использования или отведения с учетом его качества, тыс. куб. м  |19|', type: "water", width: 45, align : "center"},
 
-                    { name: "vol_wu2", title: ' Передано воды без использования или отведения с учетом его качества, тыс. куб. м', type: "water", width: 45, align : "center"},
-
-                    { name: "trf_cod_wu3", title: 'Код категории качества воды', type: "select",
+                    { name: "trf_cod_wu3", title: 'Код категории качества воды  |20| ', type: "select",
                         items: [
-                              { Name: " - введите - ", Id: 0 },
+                              { Name: " - выбор - ", Id: 0 },
 
                               { Name: "[ПО] Вода питьевая добытая подземная пресная ", Id: 1},
                               { Name: "[ПМ] Вода питьевая добытая подземная минеральная" , Id: 2},
@@ -361,23 +375,21 @@ jsGrid.fields.water = WaterField;
                               { Name: "[КН] Вода сточная в системах коммунальной канализации " , Id: 11 },
                               { Name: "[КЖ] Вода сточная в системах навозоудаления" , Id: 12 },
                               { Name: "[КП] Вода сточная в прочих системах водоотведения (канализации)" , Id: 13 },
-                              { Name: "[ПС] Вода поверхностная сточная " , Id: 14 }
+                              { Name: "[ПС] Вода поверхностная сточная" , Id: 14 }
 
                                ],
                       valueField: "Id",
                       textField: "Name",
 
-
                      width: 30, align : "left" },
 
-
-                    { name: "vol_wu3", title: ' Передано воды без использования или отведения с учетом его качества, тыс. куб. м', type: "water", width: 45, align : "center"},
-
+                    { name: "vol_wu3", title: ' Передано воды без использования или отведения с учетом его качества, тыс. куб. м  |21|', type: "water", width: 45, align : "center"},
 
 
-                    { name: "trf_cod_au", title: 'Код категории качества воды после использования ', type: "select",
+
+                    { name: "trf_cod_au", title: 'Код категории качества воды после использования |22|', type: "select",
                         items: [
-                              { Name: " - введите - ", Id: 0 },
+                              { Name: " - выбор - ", Id: 0 },
 
                               { Name: "[КН] Вода сточная в системах коммунальной канализации " , Id: 11 },
                               { Name: "[КЖ] Вода сточная в системах навозоудаления" , Id: 12 },
@@ -390,14 +402,15 @@ jsGrid.fields.water = WaterField;
 
                      width: 30, align : "left" },
 
-                    { name: "vol_au", title: 'Передано  воды после  использования или отведения с учетом его качества, тыс. куб. м', type: "water", width: 45, align : "center"},
+                    { name: "vol_au", title: 'Передано  воды после  использования или отведения с учетом его качества, тыс. куб. м |23|', type: "water", width: 45, align : "center"},
 
+                    { name: "code_gvk_au", title: 'Код водоп-ля по ГВК  |24|', type: "text", width: 30 },
 
-                    { name: "lost_total", title: 'Потери и неучтенные раcходы воды - Всего, тыс. куб. м', type: "water", width: 35, align : "center"},
+                    { name: "lost_total", title: 'Потери и неучтенные раcходы воды - Всего, тыс. куб. м  |25|', type: "water", width: 35, align : "center"},
 
-                    { name: "lost_transport", title: 'Потери и неучтенные раходы воды при транспортировке, тыс. куб. м', type: "water", width: 35, align : "center"},
+                    { name: "lost_transport", title: 'Потери и неучтенные раходы воды при транспортировке, тыс. куб. м |26|', type: "water", width: 35, align : "center"},
 
-                    { name: "use_bez", title: 'Безвозвратное водопотребление, тыс. куб. м', type: "water", width: 35, align : "center"},
+                    { name: "use_bez", title: 'Безвозвратное водопотребление, тыс. куб. м |27|', type: "water", width: 35, align : "center"},
 
                     { type: "control" }
                 ]
@@ -405,4 +418,6 @@ jsGrid.fields.water = WaterField;
 
           });
     </script>
+
+
 {% endblock %}

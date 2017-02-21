@@ -27,7 +27,7 @@ SECRET_KEY = '$bv^c!*^9l4z3vm2d5=eqd^xqzhn5s%#(^&9j9*#2d#xzs)n)6'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.1.100','127.0.0.1','192.168.1.4','86.57.156.185' ]
 
 
 # Application definition
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'crispy_forms',
+    'django_tables2',
     'inform',
 ]
 
